@@ -3,14 +3,33 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Article
 from .serializers import ArticleSerializer
+from django.shortcuts import render
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.response import Response
+
+from .models import Article
+from rest_framework.views import APIView
 
 
+class index(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'index.html'
+
+    def get(self, request):
+        queryset = Article.objects.all()
+        return Response({'articles': queryset})
+
+
+"""def index(request):
+    article = Article.objects.all()[::-1]
+    return render(request, 'index.html')
+"""
 class ArticleView(APIView):
-    def get(self, request, pk):
+    def get(self, request, *args, **kwargs):
         articles = Article.objects.all()
         serializer = ArticleSerializer(articles, many=True)
         return Response({"articles": serializer.data})
-    def post(self, request, pk):
+    def post(self, request, *args, **kwargs):
         article = request.data.get("article")
         # Create an article from the above data
         serializer = ArticleSerializer(data=article)
